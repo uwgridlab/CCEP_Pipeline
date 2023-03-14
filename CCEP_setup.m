@@ -12,3 +12,4 @@ save(fullfile(basedir_app, 'datadir.mat'), 'datadir');
 
 % indicate completion
 disp('CCEP_Pipeline has been successfully set up. Type CCEP into your workspace to get started.')
+clearvars';
