@@ -1,5 +1,5 @@
 function [amplitude, anode, cathode, data, fs, onsets_samps, pulse_width, ...
-    badchans, goodchans, pw_data, ypct, spct, dist] = ...
+    badchans, goodchans, pw_data, yp, sp] = ...
     newFileCalcs(filedir, filename)
 %NEWFILECALCS Summary of this function goes here
 %   Detailed explanation goes here
@@ -17,12 +17,19 @@ function [amplitude, anode, cathode, data, fs, onsets_samps, pulse_width, ...
     
     fprintf('Computing power spectra...\n');
     pw_data = calcPWelch(rs_data, fs);
+    
+    fprintf('Epoching raw data for noise calculations...\n');
+    [epoched, tEpoch] = epochData(data, onsets_samps, .5, 1, fs);
+    
     fprintf('Fitting LF noise models...\n');
-    [ypct, spct, yval, sval, yp, sp] = calcLF(data, onsets_samps, fs);
-    fprintf('Computing high-frequency noise values...\n');
-    [dist, timeseries] = calcHF(rs_data);
-    save(fullfile(filedir, 'noise_vals.mat'), 'pw_data', 'ypct', 'spct', ...
-        'yval', 'sval', 'yp', 'sp', 'dist', 'timeseries');
+    [yval, sval, yp, sp] = calcLF(epoched, tEpoch, onsets_samps, fs);
+    
+    % not sure what HF metric should be, temporarily removing
+%     fprintf('Computing high-frequency noise values...\n');
+%     timeseries = calcHF(rs_data);
+    
+    save(fullfile(filedir, 'noise_vals.mat'), 'pw_data', ...
+        'yval', 'sval', 'yp', 'sp');
     
     acceptedBadTrial = false;
     acceptedNoiseTol = false;
