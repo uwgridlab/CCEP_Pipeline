@@ -1,15 +1,10 @@
-function [timeseries] = calcHF(epoched, tEpoch)
+function [ampsum, amprms] = calcHF(fft_vals, F)
 %CALCHF Summary of this function goes here
 %   Detailed explanation goes here
 
-    bl = tEpoch >= -0.4 & tEpoch <= -0.1;
-    blvals = squeeze(median(abs(diff(epoched(bl, :, :)))));
-    blvals = blvals./squeeze(std(epoched(bl, :, :)));
-
-%     goodchans = find(~any(isnan(rs_data)));
-%     
-%     timeseries = nan(size(rs_data, 1) - 1, size(rs_data, 2));
-%     timeseries(:, goodchans) = diff(rs_data(:, goodchans))./std(rs_data(:, goodchans));
+    F_use = F >= 250 & F <= 2000;
+    ampsum = sum(fft_vals(F_use, :));
+    amprms = rms(fft_vals(F_use, :));
 
 end
 
