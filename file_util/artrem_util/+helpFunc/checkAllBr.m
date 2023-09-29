@@ -83,17 +83,16 @@ function [datout, allchck, br] = checkAllBr(data, fsData, anode, cathode, ...
                 'recoverExp',0,'maxAmps',maxAmps,'maxLocation',maxLocation,...
                 'bracketRange',bracketRange,'expThreshDiffCut',75,...
                 'expThreshVoltageCut',75,'minClustSize',1,'useProcrustes',1);
-            txt.Value = vertcat({'--- Extracting data ---'}, txt.Value); pause(0.1);
-            txt.Value = vertcat({'--- Checking removal quality ---'}, txt.Value); pause(0.1);
+            txt.Value = vertcat({'--- Extracting data ---'}, txt.Value); pause(0.01);
+            txt.Value = vertcat({'--- Checking removal quality ---'}, txt.Value); pause(0.01);
             chck = analyFunc.assess_removal(processedSig, startInds, endInds);
-            txt.Value = vertcat({'--- Artifact removal complete! ---'}, txt.Value); pause(0.1);
+            txt.Value = vertcat({'--- Artifact removal complete! ---'}, txt.Value); pause(0.01);
             
             loc{b2} = da;
             loc_allchck{b2} = chck;
 
             if plotIt
                 subplot(dims(b1, 1), dims(b1, 2), b2);
-%                 figure;
                 plot(data, 'r');
                 hold on;
                 plot(da);

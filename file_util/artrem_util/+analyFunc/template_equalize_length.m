@@ -1,23 +1,35 @@
-function [template,templateArrayCell, maxIdxArray] = template_equalize_length(templateCell,rawSig,txt,varargin)
+function [templateArrayCell, maxIdxArray] = ...
+    template_equalize_length(templateCell, rawSig, txt, startInds, lengthMax)
+ 
+% This function pads artifacts over all channels to make them the same
+% length as the longest artifact on that channel
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-p = inputParser;
+% ARGUMENTS: 
 
-addRequired(p,'templateCell',@iscell);
-addRequired(p,'rawSig',@isnumeric);
-addRequired(p, 'txt');
+% templateCell = 1 x channels cell array with nested cells for each trial
+%   and each artifact per trial (if relevant) ?
+%   templateCell{chan}{trial}{stim}
+% rawSig = samples x channels x trials
+% txt = text window to print output
+% startInds = cell array of the start indices each artifact for each
+%	channel and trial - startInds{trial}{channel}
+% lengthMax = 1 x channels array with the length of the longest artifact
+%   for each channel
 
-addParameter(p,'goodCell', {}, @iscell);
-addParameter(p,'startInds',[],@iscell);
-addParameter(p,'lengthMax',25,@isnumeric);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-p.parse(templateCell,rawSig,txt,varargin{:});
-templateCell = p.Results.templateCell;
-rawSig = p.Results.rawSig;
-txt = p.Results.txt;
-startInds = p.Results.startInds;
-lengthMax = p.Results.lengthMax;
+% RETURNS:
+
+% templateArrayCell = 1 x chans cell array with an array of templates for
+%   the channel in each cell (samps x trials)
+% maxIdxArray = 1 x chans cell array with array of the sample with the
+%   maximum amplitude for each trial in that channel (1 x trials)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% adapted from software by D Caldwell
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -52,6 +64,5 @@ templateArrayCell = cellfun(@(x) [x{:}], template, 'UniformOutput', false);
 maxIdxArray = cellfun(@(x) [x{:}], maxIdx, 'UniformOutput', false);
 
 txt.Value = vertcat({'--- Finished equalizing artifact length ---'}, txt.Value);
-% fprintf(['-------Finished making artifacts the same length-------- \n'])
 
 end

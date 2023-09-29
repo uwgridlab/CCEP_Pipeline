@@ -1,27 +1,47 @@
-function [templateCell,lengthMax,maxAmps,maxLocation] = get_artifacts(rawSig,varargin)
+function [templateCell, maxAmps, lengthMax] = get_artifacts(rawSig, goodCell, ...
+    startInds, endInds)
+
+% This function extracts artifacts from each channel and trial to use in
+% dictionary building
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-p = inputParser;
 
-validData = @(x) isnumeric(x);
-addRequired(p,'rawSig',validData);
-addParameter(p,'plotIt',0,@(x) x==0 || x ==1);
-addParameter(p,'goodCell',[1:64],@iscell);
-addParameter(p,'startInds',[],@iscell);
-addParameter(p,'endInds',[],@iscell);
-addParameter(p,'normalize','firstSamp',@isstr);
-addParameter(p,'amntPreAverage',3,@isnumeric)
+% ARGUMENTS: 
 
-p.parse(rawSig,varargin{:});
-rawSig = p.Results.rawSig;
-plotIt = p.Results.plotIt;
-startInds = p.Results.startInds;
-endInds = p.Results.endInds;
-goodCell = p.Results.goodCell;
-normalize = p.Results.normalize;
-amntPreAverage = p.Results.amntPreAverage;
+% rawSig = samples x channels x trials
+% goodCell = trials x 1 cell array with good channels for each trial  in
+%   each cell
+% startInds = cell array of the start indices each artifact for each
+%	channel and trial - startInds{trial}{channel}
+% endsInds = cell array of the end indices of each artifact for each
+%	channel and trial - endInds{trial}{channel}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% RETURNS:
+
+% templateCell = 1 x channels cell array with nested cells for each trial
+%   and each artifact per trial (if relevant) ?
+%   templateCell{chan}{trial}{stim}
+% maxAmps = 1 x channels arry with maximum amplitude over all artifacts for
+%   each channel
+% lengthMax = 1 x channels array with the length of the longest artifact
+%   for each channel
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% adapted from software by D Caldwell
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% if goodCell is not provided, all channels are labeled as good for all
+% trials
+if isempty(goodCell)
+    goodCell = repmat({1:size(rawSig, 2)}, size(stimRecord, 1), 1);
+end
+% hardcoded:
+amntPreAverage = 3;
 
 nTrials = length(startInds); nChans = size(rawSig, 2);
 
@@ -44,17 +64,7 @@ for trial = 1:nTrials % loop through trials
             
             rawSigTemp = rawSig(win, chan);
             
-            switch normalize
-                case 'preAverage'
-                    avgSignal{sts} = rawSigTemp - mean(rawSigTemp(1:amntPreAverage));% take off average of first x samples
-                case 'none'
-                    avgSignal{sts} = rawSigTemp;
-                case 'firstSamp'
-                    avgSignal{sts} = rawSigTemp - rawSigTemp(1);
-                case 'mean'
-                    avgSignal{sts} = rawSigTemp - mean(rawSigTemp);
-                    
-            end
+            avgSignal{sts} = rawSigTemp - mean(rawSigTemp(1:amntPreAverage));% take off average of first x samples
                         
         end
         
@@ -71,27 +81,13 @@ for trial = 1:nTrials % loop through trials
             maxTrials(trial, chan) = median(maxLoc);
         end
         
-        if plotIt && (trial == 10 || trial == 1000)
-            figure
-            plot(rawSigTemp,'linewidth',2)
-            vline(startInds{trial})
-            vline(endInds{trial},'g')
-        end
-        
     end
     lengthMaxVecTrial(trial,:) = lengthMaxChan;
     
 end
 
-% figure out the maximum amplitude artifact for each given channel and
-% trial
-
-% find maximum index for reducing dimensionality later
-[maxAmps, idxMaxTrial] = nanmax(maxTrials); % maximum amplitude for each trial
-[~, maxChan] = max(maxAmps); % the channel with the maximal value in the artifact
-maxLocation = maxLocationTrials(idxMaxTrial(maxChan), maxChan); % the index of maxAmps in the maximal trial
-
-% get the maximum length of any given artifact window for each channel
+% find max amplitude, artifact length for each channel
+maxAmps = nanmax(maxTrials);
 lengthMax = max(lengthMaxVecTrial,[],1);
 
 end

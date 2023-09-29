@@ -1,6 +1,37 @@
 function [templateArrayCell, maxLocation] = template_align(templateArrayCell, ...
-    maxIdxArray, alignmentSimilarity, txt)
+    maxIdxArray, txt)
 
+% This function cross-correlates across artifacts to align maxima across
+% trials for each channel
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% ARGUMENTS: 
+
+% templateArrayCell = 1 x chans cell array with an array of templates for
+%   the channel in each cell (samps x trials)
+% maxIdxArray = 1 x chans cell array with array of the sample with the
+%   maximum amplitude for each trial in that channel (1 x trials)
+% txt = text window to print output
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% RETURNS:
+
+% templateArrayCell = 1 x chans cell array with an array of templates for
+%   the channel in each cell (samps x trials), now aligned to max
+% maxLocation = 1 x chans array with the index of the maximum across trials
+%   for each channel
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% adapted from software by D Caldwell
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    % hardcoded:
+    alignmentSimilarity = 0.9;
+    
     maxLocation = zeros(1, size(templateArrayCell, 2));
     for chan = 1:length(templateArrayCell)
         
@@ -31,8 +62,7 @@ function [templateArrayCell, maxLocation] = template_align(templateArrayCell, ..
         maxLocation(chan) = newCtr;
     end
     
-    txt.Value = vertcat({'--- Finished equalizing artifact length ---'}, txt.Value); pause(0.1);
-%     fprintf(['-------Finished making artifacts the same length-------- \n'])
+    txt.Value = vertcat({'--- Finished equalizing artifact length ---'}, txt.Value); pause(0.01);
 
 end
 
