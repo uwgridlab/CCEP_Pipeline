@@ -1,4 +1,4 @@
-function [amplitude, anode, cathode, data, fs, onsets_samps, pulse_width, ...
+function [amplitude, anode, cathode, data, fs, onsets_samps, rs_idx, pulse_width, ...
     badchans, goodchans, pw_data, yp, sp, ampsum, amprms, fft_vals] = ...
     newFileCalcs(filedir, filename)
 %NEWFILECALCS Summary of this function goes here
@@ -8,8 +8,8 @@ function [amplitude, anode, cathode, data, fs, onsets_samps, pulse_width, ...
     load(fullfile(filedir, filename), 'amplitude', 'anode', 'cathode', ...
         'data', 'fs', 'onsets_samps', 'pulse_width');
     
-    rs_data = extractRest(data, onsets_samps, fs);
-    save(fullfile(filedir, 'rs_data.mat'), 'rs_data', '-v7.3');
+    [rs_data, rs_idx] = extractRest(data, onsets_samps, fs);
+    save(fullfile(filedir, 'rs_data.mat'), 'rs_data', 'rs_idx', '-v7.3');
     
     fprintf('Computing power spectra...\n');
     pw_data = calcPWelch(rs_data, fs);
@@ -27,9 +27,8 @@ function [amplitude, anode, cathode, data, fs, onsets_samps, pulse_width, ...
     [ampsum, amprms] = calcHF(fft_vals, F);
     
     fprintf('Detecting bad channels...\n');
-    [badchans, goodchans] = calcBadChans(rs_data, fft_vals, F);
+    [badchans, goodchans] = calcBadChans(rs_data);
     save(fullfile(filedir, 'badchans.mat'), 'badchans', 'goodchans');
-
     
     save(fullfile(filedir, 'noise_vals.mat'), 'pw_data', ...
         'yval', 'sval', 'yp', 'sp', 'ampsum', 'amprms', 'fft_vals', 'F');

@@ -30,7 +30,7 @@ function [goodCell] = good_channel_extract(numChans, bads, stimChans)
 numTrials = size(stimChans, 1);
 
 if isempty(bads)
-    bads = false(numTrials, numChannels);
+    bads = false(numTrials, numChans);
 elseif size(stimChans, 1) ~= size(bads, 1)
     error(['stimChans should be trials x 2 (annode cathode),' ... 
         'bads should be a logical array of trials x channels' ... 

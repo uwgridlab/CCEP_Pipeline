@@ -52,7 +52,7 @@ function [processedSig,templateArrayCellOutput] = ...
 %%
 % hardcoded:
 amntPreAverage = 3;
-minPts = 2;
+minPts = 1;
 minClustSize = 1;
 outlierThresh = 0.95;
 
@@ -72,13 +72,13 @@ for chan = 1:size(rawSig, 2)
     if isempty(templateArray)
         continue
     end
-    
+    % shorten data to be centered around the peak +/- the bracketRange. In
+    % this way there is less clustering around non-discriminative data
+    % points.
+    templateArrayShortened = templateArray(maxLocation(chan)+bracketRange,:);
+
     % data is in "templateArrayShorted". We will initiate a new HDBSCAN instance
-    clusterer = HDBSCAN.HDBSCAN( templateArrayShortened',txt);
-    
-    % we can view our data matrix size
-    txt.Value = vertcat({sprintf('number of points: %i', clusterer.nPoints)}, ...
-        {sprintf('number of dimensions: %i', clusterer.nDims)}, txt.Value); pause(0.01);
+    clusterer = HDBSCAN.HDBSCAN( templateArrayShortened');
     
     try
         % (1) directly set the parameters
@@ -114,7 +114,7 @@ for chan = 1:size(rawSig, 2)
         for ii = vectorUniq'
             if ii~=0
                 meanTempArray = mean(templateArray(:,labels==ii),2);
-                templateArrayExtracted = [templateArrayExtracted (meanTempArray)]; %no subtraction
+                templateArrayExtracted = [templateArrayExtracted meanTempArray]; %no subtraction
             end
         end
         % if no good clusters, try just
@@ -191,28 +191,29 @@ for chan = 1:size(templateArrayCell, 2)
                 adjustTemplates = true;
             end
             
-            if (bracketRangeMax >= sizeTemplates(1))
+            if (bracketRangeMax > sizeTemplates(1))
                 bracketRangeMax = sizeTemplates(1) - maxLocation;
                 adjustTemplates = true;
             end
             
+            bracketRangeAdj = bracketRange;
+            
             if adjustTemplates
-                bracketRange = [bracketRangeMin:bracketRangeMax];% - maxLocation;
+                bracketRangeAdj = bracketRangeMin:bracketRangeMax;% - maxLocation;
             end
             
-            if isempty(bracketRange)
-                bracketRange = 1:length(templatesSts)-1;
+            if isempty(bracketRangeAdj)
+                bracketRangeAdj = 0:size(templatesSts, 1)-1;
                 maxLocation = 1;
             end
             
-            templatesStsShortened = templatesSts(maxLocation+bracketRange,:);
-            extractedSigShortened = extractedSig(maxLocation+bracketRange,:);
+            templatesStsShortened = templatesSts(maxLocation+bracketRangeAdj,:);
+            extractedSigShortened = extractedSig(maxLocation+bracketRangeAdj,:);
                                
             sizeTemplates = size(templatesStsShortened,2);
             xcorrMat = zeros(1, sizeTemplates);
             xcorrIdxMat = zeros(1, sizeTemplates);
             for idx = 1:sizeTemplates
-
                 locX = xcorr(extractedSigShortened, templatesStsShortened(:, idx), 'coeff');
                 [xcorrMat(idx), xcorrIdxMat(idx)] = max(abs(locX));
             end
@@ -239,15 +240,15 @@ for chan = 1:size(templateArrayCell, 2)
             scaling = (max(extractedSig) - min(extractedSig))/(max(templateSubtract) ...
                 - min(templateSubtract));
             templateSubtract = templateSubtract*scaling;
+            
+            yshift = processedSig(win(1), chan) - templateSubtract(1);
+
+            templateSubtract = templateSubtract + yshift;
+
+            processedSig(win, chan) = processedSig(win, chan) - templateSubtract + ...
+                processedSig(win(1), chan);
                 
     end
-            
-    yshift = processedSig(win(1), chan) - templateSubtract(1);
-
-    templateSubtract = templateSubtract + yshift;
-
-    processedSig(win, chan) = processedSig(win, chan) - templateSubtract + ...
-        processedSig(win(1), chan);
-            
+        
 end
 end

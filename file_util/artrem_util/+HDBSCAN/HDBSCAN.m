@@ -107,7 +107,6 @@ classdef HDBSCAN < handle
     properties
         nPoints
         nDims
-        txt
         model
         kdtree
         data
@@ -127,13 +126,12 @@ classdef HDBSCAN < handle
     
     methods
         
-        function self = HDBSCAN( X, txt )
+        function self = HDBSCAN( X )
             % creates an instance of the HDBSCAN object
             
             self.data = X;
             self.nPoints = size( X,1 );
             self.nDims = size( X,2 );
-            self.txt = txt;
             
         end
             
@@ -169,12 +167,6 @@ classdef HDBSCAN < handle
                 dEps = 1;
             end
             
-            if nargin > 2 && ~isempty( varargin{2} )
-                verbose = varargin{2};
-            else
-                verbose = true;
-            end
-            
             % remove previous cluster-based post processing
             self.bestClusters = [];
             self.corePoints = [];
@@ -182,28 +174,6 @@ classdef HDBSCAN < handle
             self.P = [];
             self.score = [];
             self.labels = [];
-            
-            % report cluster params if verbose = true
-            if verbose
-                self.txt.Value = vertcat({'- Training cluster hierarchy -'}, ...
-                    {sprintf('\tdata matrix size:')}, ...
-                    {sprintf('\t\t%i points x % dimensions', self.nPoints, self.nDims)}, ...
-                    {sprintf('\tmin # neighbors: %i', self.minpts)}, ...
-                    {sprintf('\tmin cluster size: %i', self.minclustsize)}, ...
-                    {sprintf('\tmin # of clusters: %i', self.minClustNum)}, ...
-                    {sprintf('\tskipping every %i iteration', dEps - 1)}, ...
-                    {sprintf('\tmetric is %s', self.metric)}, self.txt.Value);
-                pause(0.1);
-%                 fprintf( 'Training cluster hierarchy...\n' );
-%                 fprintf( '\tData matrix size:\n' );
-%                 fprintf( '\t\t%i points x %i dimensions\n\n',self.nPoints,self.nDims );
-%                 fprintf( '\tMin # neighbors: %i\n',self.minpts );
-%                 fprintf( '\tMin cluster size: %i\n',self.minclustsize );
-%                 fprintf( '\tMin # of clusters: %i\n',self.minClustNum );
-%                 fprintf( '\tSkipping every %i iteration\n',dEps-1 );
-%                 fprintf( '\tmetric is %s\n',self.metric );
-                start = clock;
-            end
                 
             % fit the hierarchical cluster tree
             self.model = HDBSCAN.hdbscan_fit( self.data,...
@@ -212,15 +182,6 @@ classdef HDBSCAN < handle
                                 'minClustNum',self.minClustNum,...
                                 'dEps',dEps,...
                                 'metric',self.metric);
-            
-            % report time to fit the model               
-            if verbose
-                stop = clock;
-                self.txt.Value = vertcat({sprintf('training took %0.3f seconds', ...
-                    (stop(end-1)*60+stop(end)) - (start(end-1)*60+start(end)))}, ...
-                    self.txt.Value); pause(0.1);
-%                 fprintf( 'Training took %0.3f seconds\n',(stop(end-1)*60+stop(end)) - (start(end-1)*60+start(end)) );
-            end
         end
         
         
