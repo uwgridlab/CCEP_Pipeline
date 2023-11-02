@@ -1,7 +1,7 @@
 function [] = QuantifyAll(fn, nchan, tEpoch, EPmean, ...
     EPmedian, EPch, ModelEqn, chck, txt, Data)
 
-    t10 = find(tEpoch >= 0.01);
+    t10 = find(tEpoch >= 0.01, 1);
     EP_wins = nan(nchan, 5);
     EP_mean_amp = nan(nchan, 4); EP_mean_lat = EP_mean_amp; 
     EP_pktr = EP_mean_amp; EP_mean_RMS = EP_mean_amp;
@@ -19,7 +19,7 @@ function [] = QuantifyAll(fn, nchan, tEpoch, EPmean, ...
         [EP_median_amp(ch, :), EP_median_lat(ch, :), EP_median_compmatch(ch, :)] = ...
             peaks_from_wins(EPmedian(:, ch), EP_wins(ch, :), EP_pktr(ch, :));
         EP_median_RMS(ch, :) = rms_from_wins(EPmedian(:, ch), EP_wins(ch, :));
-        chck_loc = chck; chck_loc(isnan(chck_loc)) = 0;
+        chck_loc = chck(:, ch); chck_loc(isnan(chck_loc)) = 0;
         chck_loc = logical(chck_loc);
         for trial = find(chck_loc')
             [EP_trial_amp(ch, :, trial), EP_trial_lat(ch, :, trial), EP_trial_compmatch(ch, :, trial)] = ...
@@ -28,6 +28,8 @@ function [] = QuantifyAll(fn, nchan, tEpoch, EPmean, ...
         end
         ct = ct + 1;
     end
+    txt.Value = vertcat({'SAVING...'}, txt.Value); pause(0.01);
     save(fn, 'EP_*');
+    txt.Value = vertcat({'Save complete!'}, txt.Value); pause(0.01);
 end
 

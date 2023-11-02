@@ -1,10 +1,12 @@
- function [amplitude, anode, cathode, data, fs, onsets_samps, pulse_width] = extract_dat(fname, montage)
+ function [amplitude, anode, cathode, data, fs, onsets_samps, pulse_width, monA] = ...
+     extract_dat(fname, montage)
 %EXTRACT_DAT Summary of this function goes here
 %   Detailed explanation goes here
-    load(fname)
+    load(fname, 'data')
 
     all_data = data; % full data struct - not needed
     [data, fs] = loadDataSynapse(all_data.streams, montage);
+    monA = sum(abs(all_data.streams.MonA.data))';
     stim_params = all_data.scalars.STMp.data; % all stim params - not needed
     
     onsets_ts = all_data.scalars.STMp.ts;
@@ -23,6 +25,6 @@
     fname = [fname{1} '_dat.mat'];
 
     save(fname, 'amplitude', 'anode', 'cathode', 'data', 'fs', 'onsets_samps', ...
-        'pulse_width', '-v7.3');
+        'pulse_width', 'monA', '-v7.3');
 end
 

@@ -1,4 +1,4 @@
-function [badchans, goodchans] = calcBadChans(rs_data)
+function [badchans, goodchans] = calcBadChans(rs_data, idx)
 %AUTOBADCHANS Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -11,12 +11,16 @@ function [badchans, goodchans] = calcBadChans(rs_data)
     s = std(rs_data);
     ampchan = s > (mean(s) + std(s));
     
+    idx = [idx{:}];
+    idx_ch = 1:size(rs_data, 2);
+    nochan = ~ismember(idx_ch, idx);
+    
 %     F_use = F >= 59 & F <= 61;
 %     amp60 = max(fft_vals(F_use, :));
 %     ampchan = amp60 >= 0.8;
     
-    badchans = find(nanchan | zchan | ampchan);
-    goodchans = find(~nanchan & ~zchan & ~ampchan);
+    badchans = find(nanchan | zchan | ampchan | nochan);
+    goodchans = find(~nanchan & ~zchan & ~ampchan & ~nochan);
 
 end
 

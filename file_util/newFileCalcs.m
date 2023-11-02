@@ -1,35 +1,38 @@
 function [amplitude, anode, cathode, data, fs, onsets_samps, rs_idx, pulse_width, ...
     badchans, goodchans, pw_data, yp, sp, ampsum, amprms, fft_vals] = ...
-    newFileCalcs(filedir, filename)
+    newFileCalcs(filedir, filename, montagefile, txt)
 %NEWFILECALCS Summary of this function goes here
 %   Detailed explanation goes here
 
-    fprintf('Loading file...\n');
+    txt.Value = vertcat({'Loading file...'}, txt.Value); pause(0.001);
     load(fullfile(filedir, filename), 'amplitude', 'anode', 'cathode', ...
-        'data', 'fs', 'onsets_samps', 'pulse_width');
+        'data', 'fs', 'onsets_samps', 'pulse_width', 'monA');
+    load(montagefile, 'idx');
     
-    [rs_data, rs_idx] = extractRest(data, onsets_samps, fs);
+    [rs_data, rs_idx] = extractRest(data, onsets_samps, monA, fs, txt);
     save(fullfile(filedir, 'rs_data.mat'), 'rs_data', 'rs_idx', '-v7.3');
     
-    fprintf('Computing power spectra...\n');
+    txt.Value = vertcat({'Computing power spectra...'}, txt.Value); pause(0.001);
     pw_data = calcPWelch(rs_data, fs);
     
-    fprintf('Computing FFT...\n');
+    txt.Value = vertcat({'Computing FFT...'}, txt.Value); pause(0.001);
     [fft_vals, F] = calcFFT(rs_data, fs);
     
-    fprintf('Epoching raw data...\n');
+    txt.Value = vertcat({'Epoching raw data...'}, txt.Value); pause(0.001);
     [epoched, tEpoch] = epochData(data, onsets_samps, .5, 1, fs);
     
-    fprintf('Fitting LF noise models...\n');
+    txt.Value = vertcat({'Fitting LF noise models...'}, txt.Value); pause(0.001);
     [yval, sval, yp, sp] = calcLF(epoched, tEpoch, onsets_samps, fs);
     
-    fprintf('Computing high-frequency noise values...\n');
+    txt.Value = vertcat({'Computing high-frequency noise values...'}, ...
+        txt.Value);
     [ampsum, amprms] = calcHF(fft_vals, F);
     
-    fprintf('Detecting bad channels...\n');
-    [badchans, goodchans] = calcBadChans(rs_data);
+    txt.Value = vertcat({'Detecting bad channels...'}, txt.Value); pause(0.001);
+    [badchans, goodchans] = calcBadChans(rs_data, idx);
     save(fullfile(filedir, 'badchans.mat'), 'badchans', 'goodchans');
     
+    txt.Value = vertcat({'Saving noise values...'}, txt.Value); pause(0.001);
     save(fullfile(filedir, 'noise_vals.mat'), 'pw_data', ...
         'yval', 'sval', 'yp', 'sp', 'ampsum', 'amprms', 'fft_vals', 'F');
     

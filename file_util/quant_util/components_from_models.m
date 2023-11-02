@@ -51,7 +51,11 @@ function [pks, lats, wins, wins_alt, pktr] = components_from_models(tEpoch, sig,
                 pktr(cc) = 1;
             end
             [~, ii] = max(loc_prom);
-            pks(cc) = loc_pks(ii); lats(cc) = loc_idx(ii) + w1_idx;
+            if isempty(loc_pks(ii))
+                pks(cc) = NaN; lats(cc) = NaN;
+            else
+                pks(cc) = loc_pks(ii); lats(cc) = loc_idx(ii) + w1_idx;
+            end
         end
     end
     

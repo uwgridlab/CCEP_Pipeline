@@ -1,31 +1,43 @@
-function [rs_data, rs_idx] = extractRest(data, onsets_samps, fs)
+function [rs_data, rs_idx] = extractRest(data, onsets_samps, monA, fs, txt)
 %EXTRACTREST Summary of this function goes here
 %   Detailed explanation goes here
 
-%     data_artrem = data;
-%     
-%     for ii = 1%:size(onsets_samps)
-%         
-%         idx = [-10 100] + onsets_samps(ii);
-%         d = data_artrem([-1 1] + idx(1), :);
-%         d = mean(d);
-%         data_artrem(idx, :) = d;
-%         
-%     end
-
-    post_stim = length(data) - onsets_samps(end) - fs*2;
-    pre_stim = onsets_samps(1) - fs*16;
-    if pre_stim >= post_stim
-        rs_idx = round(fs*15):(onsets_samps(1) - round(fs));
+    % point 1: 15s into recording
+    p1 = round(fs*15);
+    % point 2: 1s before impedance check start
+    p2 = find(monA, 1) - round(fs);
+    % if p2 is within 10ms of first stim, there's no impedance check
+    if (p2 >= onsets_samps(1) - round(fs*.01)) && (p2 <= onsets_samps(1) + round(fs*.01))
+        p2 = []; p3 = [];
+    % p3: 2s afterimpedance check end
     else
-        rs_idx = (onsets_samps(end) + round(fs*2)):length(data);
+        f = find(monA);
+        p3 = find((f - onsets_samps(1)) < -round(fs*.01), 1, 'last');
+        p3 = f(p3) + round(2*fs);
     end
+    % p4: 1s pre stim
+    p4 = onsets_samps(1) - round(fs);
+    % p5: 2s post stim
+    p5 = onsets_samps(end) + round(fs*2);
+    % p6: 5s before end of recording
+    p6 = length(data) - round(fs*5);
+    
+    % find longest interval
+    p_all = [p1 p2 p3 p4 p5 p6];
+    diff_p = diff(p_all);
+    diff_p(2:2:end) = 0; % exclude intervals during stimulation
+    [~, p_idx] = max(diff_p);
+    
+    % rs_idx set to interval between points
+    rs_idx = p_all(p_idx):p_all(p_idx + 1);
+
     if length(rs_idx) < fs*10
         warning('Less than 10s resting state available')
     elseif length(rs_idx) < fs
         error('No valid resting state available')
     else
-        fprintf('Extracting %0.1f secs resting state...\n', length(rs_idx)/fs);
+        txt.Value = vertcat(sprintf('Extracting %0.1f secs resting state...', ...
+            length(rs_idx)/fs), txt.Value); pause(0.001);
     end
     
     rs_data = data(rs_idx, :);
