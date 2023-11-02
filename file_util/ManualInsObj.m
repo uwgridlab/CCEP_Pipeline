@@ -116,6 +116,11 @@ classdef ManualInsObj < handle
         
         function obj = ChangeDes(obj)
         % change designation of channel as good or bad
+        % temporarly disable channel selection
+            for ii = 1:length(obj.ButGrp)
+                obj.ButGrp{ii}.Enable = false;
+            end
+            pause(0.001);
         % identify index of changed channel
             comp = cellfun(@(x) x.Value, obj.ButGrp);
             comp = comp(1:length(obj.PgSel));
@@ -137,6 +142,10 @@ classdef ManualInsObj < handle
         % format bad channel text string
             obj.FormatBad;
             obj.PgSel = comp;
+            for ii = 1:length(obj.ButGrp)
+                obj.ButGrp{ii}.Enable = true;
+            end
+            pause(0.001);
         end
         
         function obj = LRPush(obj, inc)
