@@ -1,7 +1,7 @@
  function [amplitude, anode, cathode, data, fs, onsets_samps, pulse_width] = extract_dat(fname, montage)
 %EXTRACT_DAT Summary of this function goes here
 %   Detailed explanation goes here
-    load(fname)
+    load(fname,'data')
 
     all_data = data; % full data struct - not needed
     [data, fs] = loadDataSynapse(all_data.streams, montage);
