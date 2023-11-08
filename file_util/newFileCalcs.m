@@ -42,12 +42,13 @@ function [amplitude, anode, cathode, data, fs, onsets_samps, rs_idx, pulse_width
     artrem_calc = false;
     artrem_acc = false;
     process_calc = false;
+    ep_confirmed = false;
     fitmodels_calc = false;
     fitmodels_acc = false;
     quant_calc = false;
     save(fullfile(filedir, 'progress_report.mat'), 'startup_calc', 'badchans_acc', ...
         'noisetol_acc', 'artrem_calc', 'artrem_acc', 'process_calc', ...
-        'fitmodels_calc', 'fitmodels_acc', 'quant_calc');
+        'ep_confirmed', 'fitmodels_calc', 'fitmodels_acc', 'quant_calc');
 
 end
 

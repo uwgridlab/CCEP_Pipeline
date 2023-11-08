@@ -86,7 +86,7 @@ classdef ManualInsObj < handle
                 for ii = (length(locidx)+1):15
                     cla(obj.AxGrp{ii}, 'reset'); 
                     obj.AxGrp{ii}.Visible = false; 
-                    obj.AxGrp{ii}.Visible = false;
+                    obj.ButGrp{ii}.Visible = false;
                 end
             end
         % enable/disable R/L buttons

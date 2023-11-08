@@ -217,6 +217,7 @@ classdef ArtRepObj < handle
                     cla(obj.AxGrp{ii}, 'reset'); 
                     obj.AxGrp{ii}.Visible = false; 
                     obj.ButGrp{ii}.Visible = false;
+                    obj.RadGrp{ii}.Visible = false;
                 end
             end
             if ~isempty(usable)
@@ -251,6 +252,7 @@ classdef ArtRepObj < handle
         function [ret, obj] = ChangeDes(obj)
         % change designation of channel as good or bad
         % temporarly disable channel selection
+            init_enable = cellfun(@(x) x.Enable, obj.ButGrp, 'UniformOutput', false);
             for ii = 1:length(obj.ButGrp)
                 obj.ButGrp{ii}.Enable = false;
             end
@@ -277,7 +279,7 @@ classdef ArtRepObj < handle
             obj.FormatNA;
             obj.PgSel = comp;
             for ii = 1:length(obj.ButGrp)
-                obj.ButGrp{ii}.Enable = true;
+                obj.ButGrp{ii}.Enable = init_enable{ii};
             end
             pause(0.001);
             ret = isempty(obj.NAccChans);

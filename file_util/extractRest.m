@@ -5,12 +5,13 @@ function [rs_data, rs_idx] = extractRest(data, onsets_samps, monA, fs, txt)
     % point 1: 15s into recording
     p1 = round(fs*15);
     % point 2: 1s before impedance check start
-    p2 = find(monA, 1) - round(fs);
+    p2 = find(monA, 1);
     % if p2 is within 10ms of first stim, there's no impedance check
     if (p2 >= onsets_samps(1) - round(fs*.01)) && (p2 <= onsets_samps(1) + round(fs*.01))
         p2 = []; p3 = [];
     % p3: 2s afterimpedance check end
     else
+        p2 = p2 - round(fs);
         f = find(monA);
         p3 = find((f - onsets_samps(1)) < -round(fs*.01), 1, 'last');
         p3 = f(p3) + round(2*fs);
@@ -35,6 +36,12 @@ function [rs_data, rs_idx] = extractRest(data, onsets_samps, monA, fs, txt)
         warning('Less than 10s resting state available')
     elseif length(rs_idx) < fs
         error('No valid resting state available')
+    elseif length(rs_idx) > fs*120
+        txt.Value = vertcat(sprintf('Extracting 120 secs resting state from %0.1f secs total...', ...
+            length(rs_idx)/fs), txt.Value);
+        md = round(length(rs_idx)/2);
+        sec = round(fs*60);
+        rs_idx = rs_idx((md - sec):(md + sec));
     else
         txt.Value = vertcat(sprintf('Extracting %0.1f secs resting state...', ...
             length(rs_idx)/fs), txt.Value); pause(0.001);

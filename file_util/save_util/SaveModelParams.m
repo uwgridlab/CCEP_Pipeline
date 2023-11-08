@@ -1,4 +1,4 @@
-function [] = SaveModelParams(fn, eqns, cmin, cmax, cstart, ncomp, pol, EPchans)
+function [] = SaveModelParams(fn, eqns, cmin, cmax, cstart, ncomp, pol)
 % if model_param file already exists, confirm overwrite
     if isfile(fn)
         cont = CallDialogBox('This will overwrite a previous model parameter file');
@@ -7,6 +7,6 @@ function [] = SaveModelParams(fn, eqns, cmin, cmax, cstart, ncomp, pol, EPchans)
     end
 % save model_param file
     if cont
-        save(fn, 'eqns', 'cmin', 'cmax', 'cstart', 'ncomp', 'pol', 'EPchans');
+        save(fn, 'eqns', 'cmin', 'cmax', 'cstart', 'ncomp', 'pol');
     end
 end
