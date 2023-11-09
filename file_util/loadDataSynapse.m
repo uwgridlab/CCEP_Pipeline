@@ -26,7 +26,7 @@ function [data, fs] = loadDataSynapse(dataStruct, montage)
     end
     
     % get sampling rate from one of the ECO structures
-    fs = dataStruct.(ff{ii}).fs;
+    fs = dataStruct.(ff{find(ecoStruct, 1)}).fs;
 
     % extract only montage channels
     data_mont = data([montage{:}], :)';

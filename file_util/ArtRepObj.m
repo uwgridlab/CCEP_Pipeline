@@ -50,7 +50,8 @@ classdef ArtRepObj < handle
         function [ARout, obj] = RunArtRepAllCh(obj, data, chan_in, pre, post)
             cellfun(@(x) cla(x, 'reset'), obj.AxGrp); 
             obj.CurPg = 1;
-            ARout = obj.RunArtRep(data, chan_in, pre, post);
+            ARout = nan(size(data));
+            ARout(:, chan_in) = obj.RunArtRep(data, chan_in, pre, post);
             obj.PlotPg(ARout);
         end
         
@@ -173,7 +174,7 @@ classdef ArtRepObj < handle
                     obj.ButGrp{ii}.Enable = false;
                     obj.RadGrp{ii}.Enable = false;
                     obj.PgSel(ii) = true;
-                    usable(usable == locidx(ii)) = [];
+                    usable(usable == ii) = [];
                 else
         % plot trials in grey
                     trls = squeeze(dataAREp(:, ii, :));
