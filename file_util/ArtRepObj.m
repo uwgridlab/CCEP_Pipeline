@@ -41,10 +41,18 @@ classdef ArtRepObj < handle
             ii = mod(chan_in, 15);
             if ii == 0; ii = 15; end
             ARout = obj.RunArtRep(data, chan_in, pre, post);
-            obj.PreLabel.Value = obj.PP(chan_in, 1);
-            obj.PostLabel.Value = obj.PP(chan_in, 2);
+            obj.PreLabel.Value = obj.PP(chan_in, 1)*1000;
+            obj.PostLabel.Value = obj.PP(chan_in, 2)*1000;
             obj.PlotCh(ARout, ii);
             obj.ChangeSel(chan_in);
+        end
+
+        function [ARout, locidx, obj] = RunArtRepPg(obj, data, pre, post)
+            cellfun(@(x) cla(x, 'reset'), obj.AxGrp); 
+            idx1 = 1 + 15*(obj.CurPg - 1);
+            locidx = idx1:min(idx1 + 14, size(data, 2));
+            ARout = obj.RunArtRep(data, locidx, pre, post);
+            obj.PlotPg(ARout);
         end
         
         function [ARout, obj] = RunArtRepAllCh(obj, data, chan_in, pre, post)
@@ -71,7 +79,7 @@ classdef ArtRepObj < handle
                         samp = loc(win); 
                         rep_win = loc((min_bl:max_bl) + obj.OnsetsSamps(trl));
                         outliers = find(isoutlier(rep_win));
-                        [~, spks] = findpeaks(zscore(rep_win), 'MinPeakProminence', 2);
+                        [~, spks] = findpeaks(zscore(rep_win), 'MinPeakProminence', 5);
                         outliers = sort(unique([1; outliers; spks; length(rep_win)]));
                         d = diff(outliers);
                         if ~any(d >= (len + 2))
@@ -208,8 +216,8 @@ classdef ArtRepObj < handle
                     end
                     obj.ButGrp{ii}.Enable = true;
                     obj.RadGrp{ii}.Enable = true;
-                    obj.PreLabel.Value = obj.PP(locidx(ii), 1);
-                    obj.PostLabel.Value = obj.PP(locidx(ii), 2);
+                    obj.PreLabel.Value = obj.PP(locidx(ii), 1)*1000;
+                    obj.PostLabel.Value = obj.PP(locidx(ii), 2)*1000;
                 end
             end
         % hide empty plots
@@ -288,33 +296,49 @@ classdef ArtRepObj < handle
         
         function obj = ChangeSel(obj, n)
             obj.CurCh = n;
-            obj.PreLabel.Value = obj.PP(n, 1);
-            obj.PostLabel.Value = obj.PP(n, 2);
+            obj.PreLabel.Value = obj.PP(n, 1)*1000;
+            obj.PostLabel.Value = obj.PP(n, 2)*1000;
             obj.PreLabel.Enable = true;
             obj.PostLabel.Enable = true;
             idx = mod(n, 15); if idx == 0; idx = 15; end
             for ii = 1:15
                 if ii == idx
-                    obj.AxGrp{ii}.BackgroundColor = [1 1 0];
+                    % obj.AxGrp{ii}.Box = true;
+                    % obj.AxGrp{ii}.BackgroundColor = [1 1 0];
+                    obj.ButGrp{ii}.BackgroundColor = [1 1 0];
                     obj.RadGrp{ii}.Value = true;
                 else
-                    obj.AxGrp{ii}.BackgroundColor = [0.94 0.94 0.94];
+                    % obj.AxGrp{ii}.Box = false;
+                    % obj.AxGrp{ii}.BackgroundColor = [0.94 0.94 0.94];
+                    obj.ButGrp{ii}.BackgroundColor = [0.96 0.96 0.96];
                     obj.RadGrp{ii}.Value = false;
                 end
             end
         end
         
-        function [chRun, allRun] = ChangePrePost(obj, pp)
-            chRun = ~isequal(pp, obj.PP(obj.CurCh, :));
+        function [chRun, allRun, pgRun] = ChangePrePost(obj, pp)
+            chRun = ~isequal(pp, obj.PP(obj.CurCh, :)*1000);
             upre = unique(obj.PP(:, 1)); upost = unique(obj.PP(:, 1));
             if length(upre) == 1 && length(upost) == 1
-                if isequal([upre upost], pp)
+                if isequal([upre upost]*1000, pp)
                     allRun = false;
                 else
                     allRun = true;
                 end
             else
                 allRun = true;
+            end
+            idx1 = 1 + 15*(obj.CurPg - 1);
+            locidx = idx1:min(idx1 + 14, size(obj.PP, 1));
+            upre = unique(obj.PP(locidx, 1)); upost = unique(obj.PP(locidx, 1));
+            if length(upre) == 1 && length(upost) == 1
+                if isequal([upre upost]*1000, pp)
+                    pgRun = false;
+                else
+                    pgRun = true;
+                end
+            else
+                pgRun = true;
             end
         end
         

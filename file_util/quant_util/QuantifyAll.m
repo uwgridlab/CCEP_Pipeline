@@ -28,6 +28,9 @@ function [] = QuantifyAll(fn, nchan, tEpoch, EPmean, ...
         end
         ct = ct + 1;
     end
+
+    EP_mean = EPmean; EP_median = EPmedian; EP_tEpoch = tEpoch;
+    
     txt.Value = vertcat({'SAVING...'}, txt.Value); pause(0.01);
     save(fn, 'EP_*');
     txt.Value = vertcat({'Save complete!'}, txt.Value); pause(0.01);

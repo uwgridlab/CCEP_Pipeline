@@ -25,8 +25,8 @@ classdef EPInsObj < handle
             obj.TEpoch = tEpoch; obj.GoodChans = goodchans; 
             
             t10 = obj.TEpoch >= 0.01;
-            obj.EPChans = find(sum(abs(data(t10, :)) > 1) >= fs*.05 | ...
-                sum(abs(data(t10, :)) > 0.5) >= fs*.25);
+            obj.EPChans = find(sum(abs(data(t10, :)) > .25) >= fs*.01 | ...
+                sum(abs(data(t10, :)) > 0.2) >= fs*.25);
             obj.AmpChans = obj.EPChans;
             
             nchans = size(data, 2);

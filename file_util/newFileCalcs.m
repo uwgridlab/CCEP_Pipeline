@@ -7,6 +7,7 @@ function [amplitude, anode, cathode, data, fs, onsets_samps, rs_idx, pulse_width
     txt.Value = vertcat({'Loading file...'}, txt.Value); pause(0.001);
     load(fullfile(filedir, filename), 'amplitude', 'anode', 'cathode', ...
         'data', 'fs', 'onsets_samps', 'pulse_width', 'monA');
+    data = double(data);
     load(montagefile, 'idx');
     
     [rs_data, rs_idx] = extractRest(data, onsets_samps, monA, fs, txt);

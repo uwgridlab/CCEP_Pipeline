@@ -9,7 +9,7 @@ function [rs_data, rs_idx] = extractRest(data, onsets_samps, monA, fs, txt)
     % if p2 is within 10ms of first stim, there's no impedance check
     if (p2 >= onsets_samps(1) - round(fs*.01)) && (p2 <= onsets_samps(1) + round(fs*.01))
         p2 = []; p3 = [];
-    % p3: 2s afterimpedance check end
+    % p3: 2s after impedance check end
     else
         p2 = p2 - round(fs);
         f = find(monA);
@@ -26,16 +26,17 @@ function [rs_data, rs_idx] = extractRest(data, onsets_samps, monA, fs, txt)
     % find longest interval
     p_all = [p1 p2 p3 p4 p5 p6];
     diff_p = diff(p_all);
+    diff_p(diff_p < 0) = 0;
     diff_p(2:2:end) = 0; % exclude intervals during stimulation
     [~, p_idx] = max(diff_p);
     
     % rs_idx set to interval between points
     rs_idx = p_all(p_idx):p_all(p_idx + 1);
 
-    if length(rs_idx) < fs*10
-        warning('Less than 10s resting state available')
-    elseif length(rs_idx) < fs
+    if length(rs_idx) < fs
         error('No valid resting state available')
+    elseif length(rs_idx) < fs*10
+        warning('Less than 10s resting state available')
     elseif length(rs_idx) > fs*120
         txt.Value = vertcat(sprintf('Extracting 120 secs resting state from %0.1f secs total...', ...
             length(rs_idx)/fs), txt.Value);
