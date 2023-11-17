@@ -51,8 +51,10 @@ classdef ArtRepObj < handle
             cellfun(@(x) cla(x, 'reset'), obj.AxGrp); 
             idx1 = 1 + 15*(obj.CurPg - 1);
             locidx = idx1:min(idx1 + 14, size(data, 2));
-            ARout = obj.RunArtRep(data, locidx, pre, post);
+            ARout = nan(size(data));
+            ARout(:, locidx) = obj.RunArtRep(data, locidx, pre, post);
             obj.PlotPg(ARout);
+            ARout = ARout(:, locidx);
         end
         
         function [ARout, obj] = RunArtRepAllCh(obj, data, chan_in, pre, post)
@@ -127,7 +129,7 @@ classdef ArtRepObj < handle
                     'UniformOutput', false);
                 NAchans_f = horzcat(NAchans_f{:}, num2str(loc(end)));
             end
-            obj.NALabel.Text = sprintf('Channels to Accept: %s', NAchans_f);
+            obj.NALabel.Text = sprintf('TO DO: accept channels %s', NAchans_f);
         end
         
         function obj = PlotCh(obj, dataARCh, ii)
