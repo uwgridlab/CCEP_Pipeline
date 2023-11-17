@@ -73,7 +73,7 @@ classdef ArtRepObj < handle
             len = pre_samps + post_samps + 1;
             max_bl = -floor((pre + 0.05)*obj.Fs); min_bl = -floor(0.5*obj.Fs);
             for ch = 1:size(data, 2)
-                if ~ismember(chan_in(ch), obj.StimChans)
+                if ~ismember(chan_in(ch), obj.StimChans) && ismember(chan_in(ch), obj.GoodChans)
                     obj.Txt.Value = vertcat({sprintf('Channel %d', chan_in(ch))}, obj.Txt.Value); pause(0.001);
                     loc = data(:, ch);
                     for trl = 1:length(obj.OnsetsSamps)
@@ -113,6 +113,7 @@ classdef ArtRepObj < handle
             % change all ch_in accepted vals to false
             obj.NAccChans = sort(unique([obj.NAccChans chan_in]));
             obj.NAccChans(ismember(obj.NAccChans, obj.StimChans)) = [];
+            obj.NAccChans(~ismember(obj.NAccChans, obj.GoodChans)) = [];
             obj.AccChans(ismember(obj.AccChans, chan_in)) = [];
             obj.AccChans = sort(unique([obj.AccChans, obj.StimChans']));
             obj.FormatNA;
