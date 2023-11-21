@@ -65,7 +65,7 @@ function [data_out, n_out, pol_out, f_out, rval_out] = componentFit(sig, tEpoch,
             [f_loc{1},gof_loc{1}] = fit(xxx, sig, sum_eqn_4, 'lower', ...
                 lwr_negpos, 'upper', upr_negpos, 'start', start_negpos);
         catch
-            f_loc{1} = []; gof_loc{1} = struct; gof_loc{1}.rsqaure = 0;
+            f_loc{1} = []; gof_loc{1} = struct; gof_loc{1}.rsquare = 0;
         end
     end
     if ismember(2, idx_use)
@@ -73,7 +73,7 @@ function [data_out, n_out, pol_out, f_out, rval_out] = componentFit(sig, tEpoch,
             [f_loc{2},gof_loc{2}] = fit(xxx, sig, sum_eqn_4, 'lower', ....
                 lwr_posneg, 'upper', upr_posneg, 'start', start_posneg);
         catch
-            f_loc{2} = []; gof_loc{2} = struct; gof_loc{2}.rsqaure = 0;
+            f_loc{2} = []; gof_loc{2} = struct; gof_loc{2}.rsquare = 0;
         end
     end
     if ismember(3, idx_use)
@@ -81,7 +81,7 @@ function [data_out, n_out, pol_out, f_out, rval_out] = componentFit(sig, tEpoch,
             [f_loc{3},gof_loc{3}] = fit(xxx, sig, sum_eqn_3, 'lower', ...
                 lwr_negpos(1:9), 'upper', upr_negpos(1:9), 'start', start_negpos(1:9));
         catch
-            f_loc{3} = []; gof_loc{3} = struct; gof_loc{3}.rsqaure = 0;
+            f_loc{3} = []; gof_loc{3} = struct; gof_loc{3}.rsquare = 0;
         end
     end
     if ismember(4, idx_use)
@@ -89,7 +89,7 @@ function [data_out, n_out, pol_out, f_out, rval_out] = componentFit(sig, tEpoch,
             [f_loc{4},gof_loc{4}] = fit(xxx, sig, sum_eqn_3, 'lower', ....
                 lwr_posneg(1:9), 'upper', upr_posneg(1:9), 'start', start_posneg(1:9));
         catch
-            f_loc{4} = []; gof_loc{4} = struct; gof_loc{4}.rsqaure = 0;
+            f_loc{4} = []; gof_loc{4} = struct; gof_loc{4}.rsquare = 0;
         end
     end
     if ismember(5, idx_use)
@@ -97,7 +97,7 @@ function [data_out, n_out, pol_out, f_out, rval_out] = componentFit(sig, tEpoch,
             [f_loc{5},gof_loc{5}] = fit(xxx, sig, sum_eqn_2, 'lower', ...
                 lwr_negpos(1:6), 'upper', upr_negpos(1:6), 'start', start_negpos(1:6));
         catch
-            f_loc{5} = []; gof_loc{5} = struct; gof_loc{5}.rsqaure = 0;
+            f_loc{5} = []; gof_loc{5} = struct; gof_loc{5}.rsquare = 0;
         end
     end
     if ismember(6, idx_use)
@@ -105,7 +105,7 @@ function [data_out, n_out, pol_out, f_out, rval_out] = componentFit(sig, tEpoch,
             [f_loc{6},gof_loc{6}] = fit(xxx, sig, sum_eqn_2, 'lower', ....
                 lwr_posneg(1:6), 'upper', upr_posneg(1:6), 'start', start_posneg(1:6));
         catch
-            f_loc{6} = []; gof_loc{6} = struct; gof_loc{6}.rsqaure = 0;
+            f_loc{6} = []; gof_loc{6} = struct; gof_loc{6}.rsquare = 0;
         end
     end
     if ismember(7, idx_use)
@@ -113,7 +113,7 @@ function [data_out, n_out, pol_out, f_out, rval_out] = componentFit(sig, tEpoch,
             [f_loc{7},gof_loc{7}] = fit(xxx, sig, sum_eqn_1, 'lower', ...
                 lwr_negpos(1:3), 'upper', upr_negpos(1:3), 'start', start_negpos(1:3));
         catch
-            f_loc{7} = []; gof_loc{7} = struct; gof_loc{7}.rsqaure = 0;
+            f_loc{7} = []; gof_loc{7} = struct; gof_loc{7}.rsquare = 0;
         end
     end
     if ismember(8, idx_use)
@@ -121,7 +121,7 @@ function [data_out, n_out, pol_out, f_out, rval_out] = componentFit(sig, tEpoch,
             [f_loc{8},gof_loc{8}] = fit(xxx, sig, sum_eqn_1, 'lower', ....
                 lwr_posneg(1:3), 'upper', upr_posneg(1:3), 'start', start_posneg(1:3));
         catch
-            f_loc{8} = []; gof_loc{8} = struct; gof_loc{8}.rsqaure = 0;
+            f_loc{8} = []; gof_loc{8} = struct; gof_loc{8}.rsquare = 0;
         end
     end
 
